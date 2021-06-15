@@ -1,23 +1,26 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { connect } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import { addContact } from "../actions/contactActions";
 
-const ContactForm = () => {
-  const [contact, setContact] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-  });
+const initialState = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+};
+
+const ContactForm = ({ dispatch, history }) => {
+  const [contact, setContact] = useState(initialState);
 
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleOnChange = (event) => {
     const { name, value } = event.target;
 
-    setContact((prevState) => {
-      return {
-        ...prevState,
-        [name]: value,
-      };
+    setContact({
+      ...contact,
+      [name]: value,
     });
   };
 
@@ -26,6 +29,16 @@ const ContactForm = () => {
     const { firstName, lastName, phone } = contact;
     if (firstName !== "" && lastName !== "" && phone !== "") {
       console.log(firstName, lastName, phone);
+      dispatch(
+        addContact({
+          id: uuidv4(),
+          firstName,
+          lastName,
+          phone,
+        })
+      );
+      history.push("/list");
+      setContact(initialState);
       setErrorMsg("");
     } else {
       setErrorMsg("All the fields are required.");
@@ -74,4 +87,4 @@ const ContactForm = () => {
   );
 };
 
-export default ContactForm;
+export default connect()(ContactForm);
